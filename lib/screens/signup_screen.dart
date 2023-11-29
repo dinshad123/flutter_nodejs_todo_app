@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:fluter_nodejs_todo_app/screens/login_screen.dart';
 import 'package:fluter_nodejs_todo_app/screens/login_signup_background.dart';
+import 'package:fluter_nodejs_todo_app/services/config.dart';
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -14,6 +17,19 @@ class _SignupScreenState extends State<SignupScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  void registerUser() async {
+    var regBody = {
+      'email': emailController.text,
+      'password': passwordController.text
+    };
+    var response = await http.post(Uri.parse(registration),
+        headers: {
+          // "Access-Control-Allow-Origin": "*",
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(regBody));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +102,17 @@ class _SignupScreenState extends State<SignupScreen> {
               ElevatedButton(
                   style: ButtonStyle(
                       minimumSize:
-                      MaterialStateProperty.all(const Size(280, 60)),
+                          MaterialStateProperty.all(const Size(280, 60)),
                       backgroundColor: const MaterialStatePropertyAll(
                           Color.fromARGB(255, 209, 134, 226))),
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {}
+                    if (_formKey.currentState!.validate()) {
+                      registerUser();
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return const LoginScreen();
+                      }));
+                    }
                   },
                   child: const Text(
                     'Sign up',

@@ -14,33 +14,23 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
-  void registerUser() async {
+  void loginScreen() async {
     var regBody = {
-      'email': emailController.text,
-      'password': passwordController.text
+      "email": _emailController.text,
+      "password": _passwordController.text
     };
-    print(regBody);
-    try {
-      var response = await http.post(Uri.parse(registration),
-          headers: {
-            // "Access-Control-Allow-Origin": "*",
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(regBody));
-      print(response.statusCode);
-      if (response.statusCode == 200) {
-        // Registration successful
-        print('Registration successful');
-      } else {
-        // Registration failed
-        print('Registration failed with status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      print(e);
+
+    var response = await http.post(Uri.parse(registration),
+        body: jsonEncode(regBody),
+        headers: {"Content-Type": "application/json"});
+    var jsonResponse = jsonDecode(response.body);
+    if (jsonResponse['status']) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return const ToDoListScreen();
+      }));
     }
   }
 
@@ -72,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.all(10),
               child: TextFormField(
-                controller: emailController,
+                controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                     prefixIcon: const Icon(
@@ -94,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.all(10),
               child: TextFormField(
-                controller: passwordController,
+                controller: _passwordController,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Enter Password';
@@ -124,11 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Color.fromARGB(255, 209, 134, 226))),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    registerUser();
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const ToDoListScreen();
-                    }));
+                    loginScreen();
                   }
                 },
                 child: const Text(
