@@ -25,7 +25,7 @@ class _TodoBoxState extends State<TodoBox> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
+         const   Padding(
               padding: EdgeInsets.only(left: 10, top: 5),
               child: SafeArea(
                   child: Text(
@@ -33,7 +33,7 @@ class _TodoBoxState extends State<TodoBox> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               )),
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(left: 10, top: 5),
               child: SafeArea(
                   child: Text(

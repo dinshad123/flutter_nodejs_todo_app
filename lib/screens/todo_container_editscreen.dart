@@ -1,7 +1,13 @@
+import 'dart:convert';
+import 'package:fluter_nodejs_todo_app/screens/todo_list_screen.dart';
+import 'package:fluter_nodejs_todo_app/services/config.dart';
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:http/http.dart' as http;
 
 class TodoBoxContainerEditScreen extends StatefulWidget {
-  const TodoBoxContainerEditScreen({super.key});
+  final token;
+  TodoBoxContainerEditScreen({required this.token, super.key});
 
   @override
   State<TodoBoxContainerEditScreen> createState() =>
@@ -10,6 +16,43 @@ class TodoBoxContainerEditScreen extends StatefulWidget {
 
 class _TodoBoxContainerEditScreenState
     extends State<TodoBoxContainerEditScreen> {
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  late String userId;
+
+  @override
+  void initState() {
+    super.initState();
+    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
+    userId = jwtDecodedToken['_id'];
+  }
+
+  void addTodo() async {
+    if (_titleController.text.isNotEmpty &&
+        _descriptionController.text.isNotEmpty) {
+      var todoData = {
+        'title': _titleController.text,
+        'desc': _descriptionController.text,
+        'userId': userId,
+      };
+
+      var response = await http.post(Uri.parse(addTodoAdress),
+          body: jsonEncode(todoData),
+          headers: {"Content-Type": "application/json"});
+      // print('${response.body}');
+
+      var jsonResponse = jsonDecode(response.body);
+      print(jsonResponse['status']);
+      if (jsonResponse['status']) {
+        await Future.delayed(Duration(milliseconds: 0));
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) {
+          return ToDoListScreen();
+        }));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +80,7 @@ class _TodoBoxContainerEditScreenState
               Padding(
                 padding: EdgeInsets.all(10),
                 child: TextField(
+                  controller: _titleController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)),
@@ -59,7 +103,8 @@ class _TodoBoxContainerEditScreenState
                   decoration: BoxDecoration(
                       border: Border.all(),
                       borderRadius: BorderRadius.circular(10)),
-                  child: const TextField(
+                  child: TextField(
+                    controller: _descriptionController,
                     maxLines: 20,
                     decoration: InputDecoration(border: InputBorder.none),
                   ),
@@ -71,7 +116,9 @@ class _TodoBoxContainerEditScreenState
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          addTodo();
+                        },
                         icon: const Icon(Icons.folder),
                         label: const Text('Submit')),
                   ],

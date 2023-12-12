@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:fluter_nodejs_todo_app/screens/login_signup_background.dart';
 import 'package:fluter_nodejs_todo_app/screens/signup_screen.dart';
+import 'package:fluter_nodejs_todo_app/screens/splash_screen.dart';
 import 'package:fluter_nodejs_todo_app/screens/todo_list_screen.dart';
 import 'package:fluter_nodejs_todo_app/services/config.dart';
+import 'package:fluter_nodejs_todo_app/sharedPreferenceManager/shared_prefernce_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -17,20 +19,35 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  SharedPrefernceManager sharedManager = SharedPrefernceManager();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void loginScreen() async {
     var regBody = {
       "email": _emailController.text,
       "password": _passwordController.text
     };
 
-    var response = await http.post(Uri.parse(registration),
+    var response = await http.post(Uri.parse(login),
         body: jsonEncode(regBody),
         headers: {"Content-Type": "application/json"});
     var jsonResponse = jsonDecode(response.body);
     if (jsonResponse['status']) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return const ToDoListScreen();
+      print("its the result came:${jsonResponse['status']}");
+      var myToken = jsonResponse['token'];
+      sharedManager.addDatatoSP('token', myToken);
+      Navigator.push(context,
+          MaterialPageRoute(builder: (BuildContext context) {
+        return ToDoListScreen(
+          token: myToken,
+        );
       }));
+    } else {
+      print('something went wrong');
     }
   }
 

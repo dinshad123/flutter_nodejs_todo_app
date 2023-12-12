@@ -1,20 +1,46 @@
 import 'package:fluter_nodejs_todo_app/avatars.dart';
 import 'package:fluter_nodejs_todo_app/screens/todo_container_editscreen.dart';
 import 'package:fluter_nodejs_todo_app/screens/todolist_components/todolist_containers.dart';
+import 'package:fluter_nodejs_todo_app/sharedPreferenceManager/shared_prefernce_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class ToDoListScreen extends StatefulWidget {
-  const ToDoListScreen({super.key});
+  final token;
+  const ToDoListScreen({this.token, super.key});
 
   @override
   State<ToDoListScreen> createState() => _ToDoListScreenState();
 }
 
 class _ToDoListScreenState extends State<ToDoListScreen> {
+  SharedPrefernceManager sharedPrefernceManager = SharedPrefernceManager();
+  // late String email;
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+          child: Column(
+        children: <Widget>[
+          ListTile(
+              // leading: Text(email),
+              ),
+          const Spacer(),
+          TextButton(
+              onPressed: () {
+                sharedPrefernceManager.removeDataSP('token');
+                print('delete data');
+              },
+              child: const Text('Sign out'))
+        ],
+      )),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         forceMaterialTransparency: true,
         backgroundColor: Colors.white,
         title: Image.asset(
@@ -23,18 +49,24 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
         ),
         titleSpacing: 0.0,
         actions: [
-          IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.person,
-                color: Colors.deepPurple[300],
-              ))
+          Builder(builder: (context) {
+            return IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                icon: Icon(
+                  Icons.person,
+                  color: Colors.deepPurple[300],
+                ));
+          })
         ],
       ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const TodoBoxContainerEditScreen();
+              return TodoBoxContainerEditScreen(
+                token: widget.token,
+              );
             }));
           },
           backgroundColor: Colors.deepPurple[300],

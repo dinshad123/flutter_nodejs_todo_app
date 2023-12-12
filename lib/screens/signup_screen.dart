@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:fluter_nodejs_todo_app/screens/login_screen.dart';
 import 'package:fluter_nodejs_todo_app/screens/login_signup_background.dart';
 import 'package:fluter_nodejs_todo_app/services/config.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -29,6 +30,7 @@ class _SignupScreenState extends State<SignupScreen> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode(regBody));
+    var jsonResponse = jsonDecode(response.body);
   }
 
   @override
@@ -78,6 +80,7 @@ class _SignupScreenState extends State<SignupScreen> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: TextFormField(
+                  controller: passwordController,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Enter Password';
