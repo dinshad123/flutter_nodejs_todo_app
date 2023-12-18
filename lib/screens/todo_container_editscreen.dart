@@ -7,7 +7,10 @@ import 'package:http/http.dart' as http;
 
 class TodoBoxContainerEditScreen extends StatefulWidget {
   final token;
-  TodoBoxContainerEditScreen({required this.token, super.key});
+  String? title;
+  String? description;
+  TodoBoxContainerEditScreen(
+      {required this.token, this.title, this.description, super.key});
 
   @override
   State<TodoBoxContainerEditScreen> createState() =>
@@ -23,6 +26,10 @@ class _TodoBoxContainerEditScreenState
   @override
   void initState() {
     super.initState();
+    if (widget.title != null && widget.description != null) {
+      _titleController.text = widget.title!;
+      _descriptionController.text = widget.description!;
+    }
     Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
     userId = jwtDecodedToken['_id'];
   }
@@ -44,10 +51,11 @@ class _TodoBoxContainerEditScreenState
       var jsonResponse = jsonDecode(response.body);
       print(jsonResponse['status']);
       if (jsonResponse['status']) {
-        await Future.delayed(Duration(milliseconds: 0));
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) {
-          return ToDoListScreen();
+          return ToDoListScreen(
+            token: widget.token,
+          );
         }));
       }
     }
